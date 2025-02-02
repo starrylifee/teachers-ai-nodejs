@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Educational Prompt Management</title>
+  <link rel="stylesheet" href="/public/styles/main.css">
+</head>
+<body>
+  <header>
+    <h1>Educational Prompt Management</h1>
+  </header>
+  
+  <div class="container">
+    <!-- 사이드바 (네비게이션 메뉴) -->
+    <nav class="sidebar">
+      <ul>
+        <li>
+          <button id="nav-create" class="active" onclick="showSection('create')">Prompt 입력</button>
+        </li>
+        <li>
+          <button id="nav-manage" onclick="showSection('manage')">Prompt 관리</button>
+        </li>
+      </ul>
+    </nav>
+    
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="content">
+      <!-- 프롬프트 입력 섹션 -->
+      <section id="content-create">
+        <h2>Create New Prompt</h2>
+        <div class="form-container">
+          <!-- 좌측: 입력폼 -->
+          <div class="form-left">
+            <form id="prompt-form">
+              <div>
+                <label for="prompt-type">Prompt Type:</label>
+                <select id="prompt-type" name="prompt-type">
+                  <option value="vision">Vision</option>
+                  <option value="text">Text Generation</option>
+                  <option value="image">Image Generation</option>
+                  <option value="chatbot">Chatbot</option>
+                </select>
+              </div>
+              <div>
+                <label for="activity-code">Activity Code:</label>
+                <input type="text" id="activity-code" name="activity-code" required minlength="3">
+              </div>
+              
+              <!-- 일반 프롬프트 입력 (기본) -->
+              <div id="generic-teacher-prompt-container">
+                <label for="teacher-prompt">Teacher Prompt:</label>
+                <textarea id="teacher-prompt" name="teacher-prompt" required class="fixed-textarea"></textarea>
+              </div>
+              
+              <!-- Vision 전용 옵션 -->
+              <div id="vision-options" class="special-options" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 15px;">
+                <h3>Vision 프롬프트 생성 방법</h3>
+                <label>
+                  <input type="radio" name="vision-method" value="direct" checked> 직접 입력
+                </label>
+                <label>
+                  <input type="radio" name="vision-method" value="sample"> 샘플 선택
+                </label>
+                <label>
+                  <input type="radio" name="vision-method" value="ai"> 인공지능 도움받기
+                </label>
+                <!-- 직접 입력 -->
+                <div id="vision-direct-container" class="option-container">
+                  <label for="vision-direct">프롬프트 직접 입력:</label>
+                  <textarea id="vision-direct" rows="5" placeholder="직접 프롬프트를 입력하세요." class="fixed-textarea"></textarea>
+                </div>
+                <!-- 샘플 선택 -->
+                <div id="vision-sample-container" class="option-container" style="display: none;">
+                  <label for="vision-sample-select">샘플 프롬프트 선택:</label>
+                  <select id="vision-sample-select" style="width:50%;">
+                     <option value="">샘플을 선택하세요</option>
+                     <option value="2학년 미술시간 - 사진 속 감정 분석">2학년 미술시간 - 사진 속 감정 분석</option>
+                     <option value="2학년 사회시간 - 풍경 사진 설명">2학년 사회시간 - 풍경 사진 설명</option>
+                     <option value="2학년 과학시간 - 동물 사진 설명">2학년 과학시간 - 동물 사진 설명</option>
+                     <option value="2학년 미술시간 - 미술 작품 분석">2학년 미술시간 - 미술 작품 분석</option>
+                     <option value="3학년 과학시간 - 자연 현상 분석">3학년 과학시간 - 자연 현상 분석</option>
+                     <option value="3학년 사회시간 - 건축물 사진 설명">3학년 사회시간 - 건축물 사진 설명</option>
+                     <option value="3학년 과학시간 - 동물 행동 분석">3학년 과학시간 - 동물 행동 분석</option>
+                     <option value="3학년 사회시간 - 날씨 사진 설명">3학년 사회시간 - 날씨 사진 설명</option>
+                     <option value="4학년 과학시간 - 우주 사진 설명">4학년 과학시간 - 우주 사진 설명</option>
+                     <option value="4학년 체육시간 - 스포츠 사진 분석">4학년 체육시간 - 스포츠 사진 분석</option>
+                     <option value="5학년 사회시간 - 사람의 표정 분석">5학년 사회시간 - 사람의 표정 분석</option>
+                     <option value="5학년 사회시간 - 교통수단 사진 설명">5학년 사회시간 - 교통수단 사진 설명</option>
+                     <option value="5학년 과학시간 - 식물 사진 분석">5학년 과학시간 - 식물 사진 분석</option>
+                     <option value="6학년 사회시간 - 고대 유물 사진 설명">6학년 사회시간 - 고대 유물 사진 설명</option>
+                     <option value="6학년 역사시간 - 인물 사진 설명">6학년 역사시간 - 인물 사진 설명</option>
+                     <option value="6학년 사회시간 - 풍경 사진의 계절 설명">6학년 사회시간 - 풍경 사진의 계절 설명</option>
+                     <option value="6학년 과학시간 - 기후 변화 사진 분석">6학년 과학시간 - 기후 변화 사진 분석</option>
+                     <option value="6학년 역사시간 - 역사적 사건 사진 설명">6학년 역사시간 - 역사적 사건 사진 설명</option>
+                     <option value="6학년 사회시간 - 문화 행사 사진 설명">6학년 사회시간 - 문화 행사 사진 설명</option>
+                     <option value="6학년 과학시간 - 직업 사진 설명">6학년 과학시간 - 직업 사진 설명</option>
+                  </select>
+                  <br>
+                  <label for="vision-sample-prompt">프롬프트 내용:</label>
+                  <textarea id="vision-sample-prompt" rows="5" placeholder="샘플 프롬프트를 수정하세요." class="fixed-textarea"></textarea>
+                  <div class="helper-text">직접 수정해서 저장하세요.</div>
+                </div>
+                <!-- 인공지능 도움받기 -->
+                <div id="vision-ai-container" class="option-container" style="display: none;">
+                  <label for="vision-ai-topic">프롬프트 주제 또는 키워드 입력:</label>
+                  <input type="text" id="vision-ai-topic" placeholder="예: 동물 사진 분석">
+                  <button type="button" id="vision-ai-generate">인공지능 도움받기</button>
+                  <br>
+                  <label for="vision-ai-prompt">인공지능이 생성한 프롬프트:</label>
+                  <textarea id="vision-ai-prompt" rows="5" placeholder="AI가 생성한 프롬프트가 여기에 표시됩니다." class="fixed-textarea"></textarea>
+                  <div class="helper-text">내용을 수정해서 사용하세요.</div>
+                </div>
+              </div>
+              
+              <!-- Text Generation 전용 옵션 -->
+              <div id="text-options" class="special-options" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 15px;">
+                <h3>Text Generation 프롬프트 생성 방법</h3>
+                <label>
+                  <input type="radio" name="text-method" value="direct" checked> 직접 입력
+                </label>
+                <label>
+                  <input type="radio" name="text-method" value="sample"> 샘플 선택
+                </label>
+                <label>
+                  <input type="radio" name="text-method" value="ai"> 인공지능 도움받기
+                </label>
+                <!-- Text 직접 입력 -->
+                <div id="text-direct-container" class="option-container" style="margin-top: 10px;">
+                  <label for="text-direct">프롬프트 직접 입력:</label>
+                  <textarea id="text-direct" rows="5" placeholder="직접 프롬프트를 입력하세요." class="fixed-textarea"></textarea>
+                </div>
+                <!-- Text 샘플 선택 -->
+                <div id="text-sample-container" class="option-container" style="display: none; margin-top: 10px;">
+                  <label for="text-sample-select">샘플 프롬프트 선택:</label>
+                  <select id="text-sample-select" style="width:50%;">
+                     <option value="">샘플을 선택하세요</option>
+                     <option value="2학년 수학시간 - 덧셈 문제 풀기">2학년 수학시간 - 덧셈 문제 풀기</option>
+                     <option value="2학년 도덕시간 - 친구에게 줄 상장 만들기">2학년 도덕시간 - 친구에게 줄 상장 만들기</option>
+                     <option value="2학년 음악시간 - 노래 가사 이해하기">2학년 음악시간 - 노래 가사 이해하기</option>
+                     <option value="3학년 국어시간 - 이야기 요약하기">3학년 국어시간 - 이야기 요약하기</option>
+                     <option value="3학년 미술시간 - 작품 설명하기">3학년 미술시간 - 작품 설명하기</option>
+                     <option value="3학년 사회시간 - 지역 탐구">3학년 사회시간 - 지역 탐구</option>
+                     <option value="4학년 국어시간 - 주장과 근거 찾기">4학년 국어시간 - 주장과 근거 찾기</option>
+                     <option value="4학년 미술시간 - 작품 감상하기">4학년 미술시간 - 작품 감상하기</option>
+                     <option value="4학년 체육시간 - 게임 규칙 설명">4학년 체육시간 - 게임 규칙 설명</option>
+                     <option value="5학년 수학시간 - 곱셈과 나눗셈 문제 풀기">5학년 수학시간 - 곱셈과 나눗셈 문제 풀기</option>
+                     <option value="5학년 과학시간 - 동물의 생활 방식 이해하기">5학년 과학시간 - 동물의 생활 방식 이해하기</option>
+                     <option value="5학년 체육시간 - 운동 계획 세우기">5학년 체육시간 - 운동 계획 세우기</option>
+                     <option value="5학년 국어시간 - 시 쓰기 연습">5학년 국어시간 - 시 쓰기 연습</option>
+                     <option value="5학년 사회시간 - 사회상황 이해하기">5학년 사회시간 - 사회상황 이해하기</option>
+                     <option value="6학년 과학시간 - 기후 변화의 영향">6학년 과학시간 - 기후 변화의 영향</option>
+                     <option value="6학년 국어시간 - 글의 구조 파악하기">6학년 국어시간 - 글의 구조 파악하기</option>
+                  </select>
+                  <br>
+                  <label for="text-sample-prompt">프롬프트 내용:</label>
+                  <textarea id="text-sample-prompt" rows="5" placeholder="샘플 프롬프트를 수정하세요." class="fixed-textarea"></textarea>
+                  <div class="helper-text">직접 수정해서 저장하세요.</div>
+                </div>
+                <!-- Text 인공지능 도움받기 -->
+                <div id="text-ai-container" class="option-container" style="display: none; margin-top: 10px;">
+                  <label for="text-ai-topic">프롬프트 주제 또는 키워드 입력:</label>
+                  <input type="text" id="text-ai-topic" placeholder="예: 새로운 교육 방식">
+                  <button type="button" id="text-ai-generate">인공지능 도움받기</button>
+                  <br>
+                  <label for="text-ai-prompt">인공지능이 생성한 프롬프트:</label>
+                  <textarea id="text-ai-prompt" rows="5" placeholder="AI가 생성한 프롬프트가 여기에 표시됩니다." class="fixed-textarea"></textarea>
+                  <div class="helper-text">내용을 수정해서 사용하세요.</div>
+                </div>
+              </div>
+              
+              <!-- Chatbot 전용 옵션 -->
+              <div id="chatbot-options" class="special-options" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 15px;">
+                <h3>Chatbot 프롬프트 생성 방법</h3>
+                <label>
+                  <input type="radio" name="chatbot-method" value="direct" checked> 직접 입력
+                </label>
+                <label>
+                  <input type="radio" name="chatbot-method" value="sample"> 샘플 선택
+                </label>
+                <label>
+                  <input type="radio" name="chatbot-method" value="ai"> 인공지능 도움받기
+                </label>
+                <!-- Chatbot 직접 입력 -->
+                <div id="chatbot-direct-container" class="option-container" style="margin-top: 10px;">
+                  <label for="chatbot-direct">프롬프트 직접 입력:</label>
+                  <textarea id="chatbot-direct" rows="5" placeholder="직접 프롬프트를 입력하세요." class="fixed-textarea"></textarea>
+                </div>
+                <!-- Chatbot 샘플 선택 -->
+                <div id="chatbot-sample-container" class="option-container" style="display: none; margin-top: 10px;">
+                  <label for="chatbot-sample-select">샘플 프롬프트 선택:</label>
+                  <select id="chatbot-sample-select" style="width:50%;">
+                     <option value="">샘플을 선택하세요</option>
+                     <option value="기본 인사 챗봇">기본 인사 챗봇</option>
+                     <option value="숙제 도움 챗봇">숙제 도움 챗봇</option>
+                     <option value="학습 동기 부여 챗봇">학습 동기 부여 챗봇</option>
+                     <option value="언어 연습 챗봇">언어 연습 챗봇</option>
+                     <option value="퀴즈 챗봇">퀴즈 챗봇</option>
+                     <option value="공공기관 챗봇">공공기관 챗봇</option>
+                  </select>
+                  <br>
+                  <label for="chatbot-sample-prompt">프롬프트 내용:</label>
+                  <textarea id="chatbot-sample-prompt" rows="5" placeholder="샘플 프롬프트를 수정하세요." class="fixed-textarea"></textarea>
+                  <div class="helper-text">직접 수정해서 저장하세요.</div>
+                </div>
+                <!-- Chatbot 인공지능 도움받기 -->
+                <div id="chatbot-ai-container" class="option-container" style="display: none; margin-top: 10px;">
+                  <label for="chatbot-ai-topic">프롬프트 주제 또는 키워드 입력:</label>
+                  <input type="text" id="chatbot-ai-topic" placeholder="예: 챗봇 인사말">
+                  <button type="button" id="chatbot-ai-generate">인공지능 도움받기</button>
+                  <br>
+                  <label for="chatbot-ai-prompt">인공지능이 생성한 프롬프트:</label>
+                  <textarea id="chatbot-ai-prompt" rows="5" placeholder="AI가 생성한 프롬프트가 여기에 표시됩니다." class="fixed-textarea"></textarea>
+                  <div class="helper-text">내용을 수정해서 사용하세요.</div>
+                </div>
+              </div>
+
+              <!-- Image Generation 전용 옵션 -->
+              <div id="image-options" class="special-options" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 15px;">
+                <h3>Image Generation 프롬프트 생성 방법</h3>
+                <!-- 1. 이미지 주제 입력 방식 선택 -->
+                <div id="image-topic-container" class="option-container">
+                  <label>이미지 주제 입력 방식:</label>
+                  <label>
+                    <input type="radio" name="image-topic-method" value="sample" checked> 샘플 주제 선택
+                  </label>
+                  <label>
+                    <input type="radio" name="image-topic-method" value="direct"> 직접 입력
+                  </label>
+                  <!-- 샘플 주제 선택 영역 -->
+                  <div id="image-topic-sample-container" style="margin-top: 10px;">
+                    <label for="image-sample-select">샘플 이미지 주제 선택:</label>
+                    <select id="image-sample-select" style="width:50%;">
+                      <option value="">샘플 주제를 선택하세요</option>
+                      <option value="2학년 과학시간 - 숲 속의 동물">2학년 과학시간 - 숲 속의 동물</option>
+                      <option value="2학년 체육시간 - 공원에서의 놀이">2학년 체육시간 - 공원에서의 놀이</option>
+                      <option value="3학년 미술시간 - 문화 축제 장면">3학년 미술시간 - 문화 축제 장면</option>
+                      <option value="3학년 사회시간 - 바닷가 풍경">3학년 사회시간 - 바닷가 풍경</option>
+                      <option value="4학년 사회시간 - 자연재해 현장">4학년 사회시간 - 자연재해 현장</option>
+                      <option value="4학년 역사시간 - 역사적인 건축물">4학년 역사시간 - 역사적인 건축물</option>
+                    </select>
+                    <br>
+                    <label for="image-sample-topic">이미지 주제:</label>
+                    <textarea id="image-sample-topic" rows="2" placeholder="샘플 주제 설명이 여기에 표시됩니다." class="fixed-textarea"></textarea>
+                    <div class="helper-text">샘플 주제 설명을 확인하세요.</div>
+                  </div>
+                  <!-- 직접 입력 영역 -->
+                  <div id="image-topic-direct-container" class="option-container" style="display: none; margin-top: 10px;">
+                    <label for="image-topic-direct">이미지 주제 직접 입력:</label>
+                    <textarea id="image-topic-direct" rows="2" placeholder="이미지 주제를 직접 입력하세요." class="fixed-textarea"></textarea>
+                  </div>
+                </div>
+                
+                <!-- 2. 형용사 입력 방식 선택 -->
+                <div id="image-adjectives-container" class="option-container" style="margin-top: 15px;">
+                  <label>형용사 입력 방식 선택:</label>
+                  <label>
+                    <input type="radio" name="image-adjective-mode" value="default" checked> 기본 형용사 사용
+                  </label>
+                  <label>
+                    <input type="radio" name="image-adjective-mode" value="custom"> 커스텀 꾸미는 말 입력
+                  </label>
+                  <!-- 기본 형용사 영역 -->
+                  <div id="default-adjectives-container" style="margin-top: 10px;">
+                    <strong>기본 형용사 목록:</strong>
+                    <p id="default-adjectives-text"></p>
+                  </div>
+                  <!-- 커스텀 입력 영역 -->
+                  <div id="custom-adjectives-container" class="option-container" style="display: none; margin-top: 10px;">
+                    <label for="custom-adjectives">커스텀 형용사 입력:</label>
+                    <input type="text" id="custom-adjectives" placeholder="노란, 파란, 밝은, 어두운">
+                    <div class="helper-text">쉼표로 구분하여 입력하세요.</div>
+                  </div>
+                </div>
+              </div>
+            
+              <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+              <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+              </div>
+              <div>
+                <button type="submit">Save Prompt</button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- 우측: 안내 영역 (동적 설명) -->
+          <div class="form-right">
+            <p>
+              <strong>교사용 프롬프트 생성 도구</strong><br>
+              안내: 이 도구를 사용하여 교육 활동에 필요한 프롬프트를 쉽게 생성할 수 있습니다.<br>
+              - Vision: 이미지 분석 API를 활용<br>
+              - Text Generation: 텍스트 생성 API를 활용<br>
+              - Chatbot: 챗봇 활동 프롬프트 생성<br>
+              - Image: 교사가 직접 입력한 주제어와 수식어를 결합<br>
+              <em>학생용 앱과 연동</em>: 저장한 프롬프트는 학생용 앱에서 불러와 안전하게 AI를 사용할 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 프롬프트 관리 섹션 -->
+      <section id="content-manage" style="display: none;">
+        <h2>Manage Prompts</h2>
+        <div class="search-container">
+          <label for="password-search">Enter Password:</label>
+          <input type="password" id="password-search" name="password-search">
+          <button type="button" id="search-button">Search</button>
+        </div>
+        <div id="prompt-list">
+          <table id="prompt-table">
+            <thead>
+              <tr>
+                <th>Activity Code</th>
+                <th>Prompt</th>
+                <th>Student View</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JavaScript로 검색 결과를 동적으로 삽입 -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <script src="/public/scripts/app.js"></script>
+  <script>
+    // 사이드바 버튼 클릭 시 해당 섹션을 보여주는 함수
+    function showSection(section) {
+      document.getElementById('nav-create').classList.remove('active');
+      document.getElementById('nav-manage').classList.remove('active');
+      document.getElementById('content-create').style.display = 'none';
+      document.getElementById('content-manage').style.display = 'none';
+      
+      if (section === 'create') {
+        document.getElementById('content-create').style.display = 'block';
+        document.getElementById('nav-create').classList.add('active');
+      } else if (section === 'manage') {
+        document.getElementById('content-manage').style.display = 'block';
+        document.getElementById('nav-manage').classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
