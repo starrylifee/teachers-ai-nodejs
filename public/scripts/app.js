@@ -874,4 +874,82 @@ document.addEventListener("DOMContentLoaded", () => {
             chatbotSamplePrompt.value = "";
         }
     });
+        // -------------------------------------------------------------------
+    // 여기서부터 "인공지능 도움받기" 버튼 이벤트 리스너 추가 (Vision, Text, Chatbot)
+    // -------------------------------------------------------------------
+
+    // ----- Vision 인공지능 도움받기 -----
+    document.getElementById("vision-ai-generate").addEventListener("click", async () => {
+        const topic = document.getElementById("vision-ai-topic").value.trim();
+        if (!topic) {
+            alert("Vision 프롬프트 주제 또는 키워드를 입력하세요.");
+            return;
+        }
+        try {
+            const response = await fetch("/generate-vision-ai-prompt", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById("vision-ai-prompt").value = result.prompt;
+            } else {
+                alert("AI 프롬프트 생성에 실패했습니다: " + result.error);
+            }
+        } catch (error) {
+            console.error("Error generating vision AI prompt:", error);
+            alert("프롬프트 생성 중 에러가 발생했습니다.");
+        }
+    });
+
+    // ----- Text Generation 인공지능 도움받기 -----
+    document.getElementById("text-ai-generate").addEventListener("click", async () => {
+        const topic = document.getElementById("text-ai-topic").value.trim();
+        if (!topic) {
+            alert("Text Generation 프롬프트 주제 또는 키워드를 입력하세요.");
+            return;
+        }
+        try {
+            const response = await fetch("/generate-text-ai-prompt", { // 엔드포인트 이름 확인 필요!
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById("text-ai-prompt").value = result.prompt;
+            } else {
+                alert("AI 프롬프트 생성에 실패했습니다: " + result.error);
+            }
+        } catch (error) {
+            console.error("Error generating text AI prompt:", error);
+            alert("프롬프트 생성 중 에러가 발생했습니다.");
+        }
+    });
+
+    // ----- Chatbot 인공지능 도움받기 -----
+    document.getElementById("chatbot-ai-generate").addEventListener("click", async () => {
+        const topic = document.getElementById("chatbot-ai-topic").value.trim();
+        if (!topic) {
+            alert("Chatbot 프롬프트 주제 또는 키워드를 입력하세요.");
+            return;
+        }
+        try {
+            const response = await fetch("/generate-chatbot-ai-prompt", { // 엔드포인트 이름 확인 필요!
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById("chatbot-ai-prompt").value = result.prompt;
+            } else {
+                alert("AI 프롬프트 생성에 실패했습니다: " + result.error);
+            }
+        } catch (error) {
+            console.error("Error generating chatbot AI prompt:", error);
+            alert("프롬프트 생성 중 에러가 발생했습니다.");
+        }
+    });
 });
