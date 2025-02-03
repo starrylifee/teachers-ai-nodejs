@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@notionhq/client": "^2.2.1",
+        "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.18.2",
         "openai": "^4.80.1"

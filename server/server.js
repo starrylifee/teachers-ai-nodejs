@@ -1,10 +1,17 @@
 const express = require('express');
+const cors = require('cors'); // 추가
 const { OpenAI } = require('openai');
 const { Client } = require('@notionhq/client');
 require('dotenv').config();
 const path = require('path');
 
 const app = express();
+
+// Chrome 확장프로그램의 Origin 허용
+app.use(cors({
+  origin: "chrome-extension://kpdhcdnledjcoghnlijefbinpejliacf"
+}));
+
 app.use(express.json());
 
 // Load API keys from environment variables
