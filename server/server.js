@@ -176,6 +176,63 @@ app.post('/generate-vision-ai-prompt', async (req, res) => {
   }
 });
 
+// Route: Generate Text AI prompt
+app.post('/generate-text-ai-prompt', async (req, res) => {
+  const { topic } = req.body;
+  if (!topic) {
+    return res.status(400).json({ success: false, error: 'Topic is required' });
+  }
+  try {
+    const response = await openaiClient.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "당신은 Text Generation API를 사용하여 교육 목적으로 프롬프트를 만드는 AI 도우미입니다."
+        },
+        {
+          role: "user",
+          content: `프롬프트의 주제는: ${topic}입니다. 이 주제를 바탕으로 창의적이고 교육적인 텍스트 생성 프롬프트를 생성해 주세요.`
+        }
+      ],
+    });
+    const aiPrompt = response.choices[0].message.content.trim();
+    res.json({ success: true, prompt: aiPrompt });
+  } catch (error) {
+    console.error("Error generating text AI prompt:", error.message);
+    res.status(500).json({ success: false, error: "Failed to generate AI prompt" });
+  }
+});
+
+// Route: Generate Chatbot AI prompt
+app.post('/generate-chatbot-ai-prompt', async (req, res) => {
+  const { topic } = req.body;
+  if (!topic) {
+    return res.status(400).json({ success: false, error: 'Topic is required' });
+  }
+  try {
+    const response = await openaiClient.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "당신은 Chatbot API를 사용하여 교육 목적으로 프롬프트를 만드는 AI 도우미입니다."
+        },
+        {
+          role: "user",
+          content: `프롬프트의 주제는: ${topic}입니다. 이 주제를 바탕으로 창의적이고 교육적인 챗봇 프롬프트를 생성해 주세요.`
+        }
+      ],
+    });
+    const aiPrompt = response.choices[0].message.content.trim();
+    res.json({ success: true, prompt: aiPrompt });
+  } catch (error) {
+    console.error("Error generating chatbot AI prompt:", error.message);
+    res.status(500).json({ success: false, error: "Failed to generate AI prompt" });
+  }
+});
+
+
 // Route: Search prompts by password
 app.post('/search-prompts', async (req, res) => {
   const { password } = req.body;
