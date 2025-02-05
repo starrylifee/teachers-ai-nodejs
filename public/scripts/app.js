@@ -987,7 +987,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${update.promptType}</td>
             <td>${update.studentName || ""}</td>
             <td>${update.teacherPrompt || ""}</td>
-            <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력 이미지" style="max-width: 100px;">` : (update.aiResult || "")}</td>
+            <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력 이미지" style="max-width: 100px;">` : ""}</td>
+            <td>${update.aiResult || ""}</td>            
             <td>${new Date(update.date).toLocaleString()}</td>
         `;
         } else if (update.promptType === "text") {
@@ -996,6 +997,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${update.studentName || ""}</td>
             <td>${update.teacherPrompt || ""}</td>
             <td>${update.inputText ? update.inputText : (update.aiResult || "")}</td>
+            <td>${update.aiResult || ""}</td>
             <td>${new Date(update.date).toLocaleString()}</td>
         `;
         } else if (update.promptType === "image") {
@@ -1003,7 +1005,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${update.promptType}</td>
             <td>${update.studentName || ""}</td>
             <td>${update.teacherPrompt || ""}</td>
-            <td>${update.adjectives || ""} ${update.aiImage ? `<br><img src="${update.aiImage}" alt="AI 이미지" style="max-width: 100px;">` : ""}</td>
+            <td>${update.adjectives || ""}</td>
+            <td>${update.aiResult ? `<img src="${update.aiResult}" alt="AI 이미지" style="max-width: 100px;">` : ""}</td>
             <td>${new Date(update.date).toLocaleString()}</td>
         `;
         } else if (update.promptType === "chatbot") {
@@ -1011,7 +1014,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${update.promptType}</td>
             <td>${update.studentName || ""}</td>
             <td>${update.studentView || ""}</td>
-            <td>${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}</td>
+            <td>
+                <div style="max-height: 100px; overflow-y: auto;">
+                    ${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}
+                </div>
+            </td>
             <td>${new Date(update.date).toLocaleString()}</td>
         `;
         } else {
