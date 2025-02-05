@@ -1020,7 +1020,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${update.studentView || ""}</td>
                 <td colspan="2">
                     <div class="scroll-cell">
-                        ${update.conversationHistory ? update.conversationHistory.join("<br>") : ""}
+                        ${update.conversationHistory ? update.conversationHistory.map(msg => msg.content).join("<br>") : ""}
                     </div>
                 </td>
                 <td>${new Date(update.date).toLocaleString()}</td>
