@@ -14,6 +14,10 @@ app.use(cors({
   origin: ["chrome-extension://kpdhcdnledjcoghnlijefbinpejliacf", "https://port-0-teachers-ai-nodejs-m6oc1d66fae356ac.sel4.cloudtype.app"]
 }));
 
+// JSON 및 URL-encoded 데이터의 최대 허용 크기를 늘림 (예: 10MB)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(express.json());
 
 // Load API keys from environment variables
