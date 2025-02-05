@@ -982,50 +982,55 @@ document.addEventListener("DOMContentLoaded", () => {
     // 각 업데이트 데이터를 바탕으로 테이블 행 생성 함수
     function renderMonitoringRow(update) {
         const tr = document.createElement("tr");
+        // 학생 이름은 그대로 출력 (null 또는 undefined일 경우 빈 문자열)
+        const studentName = update.studentName || "";
+    
         if (update.promptType === "vision") {
-        tr.innerHTML = `
-            <td>${update.promptType}</td>
-            <td>${update.studentName || ""}</td>
-            <td>${update.teacherPrompt || ""}</td>
-            <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력 이미지" style="max-width: 100px;">` : ""}</td>
-            <td>${update.aiResult || ""}</td>            
-            <td>${new Date(update.date).toLocaleString()}</td>
-        `;
+            tr.innerHTML = `
+                <td>${update.promptType}</td>
+                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${update.teacherPrompt || ""}</td>
+                <td>${""}</td>
+                <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력한 이미지" style="max-width: 100px;">` : (update.aiResult || "")}</td>
+                <td>${new Date(update.date).toLocaleString()}</td>
+            `;
         } else if (update.promptType === "text") {
-        tr.innerHTML = `
-            <td>${update.promptType}</td>
-            <td>${update.studentName || ""}</td>
-            <td>${update.teacherPrompt || ""}</td>
-            <td>${update.inputText ? update.inputText : (update.aiResult || "")}</td>
-            <td>${update.aiResult || ""}</td>
-            <td>${new Date(update.date).toLocaleString()}</td>
-        `;
+            tr.innerHTML = `
+                <td>${update.promptType}</td>
+                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${update.teacherPrompt || ""}</td>
+                <td>${update.inputText || ""}</td>
+                <td>${update.aiResult || ""}</td>
+                <td>${new Date(update.date).toLocaleString()}</td>
+            `;
         } else if (update.promptType === "image") {
-        tr.innerHTML = `
-            <td>${update.promptType}</td>
-            <td>${update.studentName || ""}</td>
-            <td>${update.teacherPrompt || ""}</td>
-            <td>${update.adjectives || ""}</td>
-            <td>${update.aiResult ? `<img src="${update.aiResult}" alt="AI 이미지" style="max-width: 100px;">` : ""}</td>
-            <td>${new Date(update.date).toLocaleString()}</td>
-        `;
+            tr.innerHTML = `
+                <td>${update.promptType}</td>
+                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${update.teacherPrompt || ""}</td>
+                <td>${update.adjectives || ""}</td>
+                <td>${update.aiImage ? `<img src="${update.aiImage}" alt="AI 결과" style="max-width: 100px;">` : ""}</td>
+                <td>${new Date(update.date).toLocaleString()}</td>
+            `;
         } else if (update.promptType === "chatbot") {
-        tr.innerHTML = `
-            <td>${update.promptType}</td>
-            <td>${update.studentName || ""}</td>
-            <td>${update.studentView || ""}</td>
-            <td>
-                <div style="max-height: 100px; overflow-y: auto;">
-                    ${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}
-                </div>
-            </td>
-            <td>${new Date(update.date).toLocaleString()}</td>
-        `;
+            tr.innerHTML = `
+                <td>${update.promptType}</td>
+                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${update.studentView || ""}</td>
+                <td>
+                    <div class="scroll-cell">
+                        ${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}
+                    </div>
+                </td>
+                <td>${update.aiResult || ""}</td>
+                <td>${new Date(update.date).toLocaleString()}</td>
+            `;
         } else {
-        tr.innerHTML = `<td colspan="5">${JSON.stringify(update)}</td>`;
+            tr.innerHTML = `<td colspan="6">${JSON.stringify(update)}</td>`;
         }
         return tr;
     }
+    
 
     // 테이블 갱신 함수 (활동 코드 필터가 있을 때만 데이터 표시)
     function updateMonitoringTable() {
@@ -1044,13 +1049,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Socket.IO를 통해 서버에서 "promptUpdated" 이벤트 수신 및 업데이트 처리
     socket.on("promptUpdated", (update) => {
-        console.log("교사용 페이지: promptUpdated 이벤트 수신:", update);
-        update.date = update.date || Date.now();
-        monitoringData.push(update);
+        if (update.promptType === "chatbot") {
+            // 동일한 activityCode와 학생 이름을 가진 기존 항목이 있는지 확인
+            const existingIndex = monitoringData.findIndex(item =>
+                item.promptType === "chatbot" &&
+                item.activityCode === update.activityCode &&
+                item.studentName === update.studentName
+            );
+            if (existingIndex !== -1) {
+                // 기존 대화 기록에 새 대화 내용을 누적
+                monitoringData[existingIndex].conversationHistory = monitoringData[existingIndex].conversationHistory.concat(update.conversationHistory);
+                // 최신 AI 응답으로 업데이트 (원하는 경우 누적 대신 최신만 표시)
+                monitoringData[existingIndex].aiResult = update.aiResult;
+                // 날짜도 최신으로 업데이트
+                monitoringData[existingIndex].date = update.date;
+            } else {
+                // 기존 항목이 없으면 새로 추가
+                monitoringData.push(update);
+            }
+        } else {
+            monitoringData.push(update);
+        }
         updateMonitoringTable();
     });
+    
 
     // CSV 다운로드 기능 (BOM 추가로 한글 깨짐 방지)
     downloadBtn.addEventListener("click", () => {

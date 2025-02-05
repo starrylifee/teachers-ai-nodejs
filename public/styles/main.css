@@ -257,4 +257,14 @@ input:focus, textarea:focus, select:focus {
     #prompt-list td, #prompt-list th {
         border: 1px solid #34495e;
     }
+    /* CSS 파일 (예: teacher-monitor.css)에 추가 */
+    .nowrap-cell {
+        white-space: nowrap;
+        min-width: 3em; /* 필요에 따라 조정 */
+    }
+    .scroll-cell {
+        max-height: 100px;
+        overflow-y: auto;
+    }
+  
 }
