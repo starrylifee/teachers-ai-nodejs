@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // 최상단에 Socket.IO 연결 생성 (한 번만 호출)
+    const socket = io();
+    console.log("교사용 페이지: Socket.IO 연결 시도");
+
+    socket.on("connect", () => {
+        console.log("교사용 페이지: Socket.IO 연결 성공, ID:", socket.id);
+    });
+
+    socket.on("connect_error", (error) => {
+        console.error("Socket.IO 연결 오류:", error);
+    });
     // ----------------------------
     // 검색, 수정, 삭제, 저장 관련 기존 코드
     // ----------------------------
@@ -952,4 +963,142 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("프롬프트 생성 중 에러가 발생했습니다.");
         }
     });
+    // -------------------------------------------------------------------
+    // 교사용 모니터링 탭 전용 코드 시작 (Socket.IO 이벤트 수신 및 테이블 갱신)
+    // -------------------------------------------------------------------
+    const monitoringBody = document.getElementById("monitoring-body");
+    const downloadBtn = document.getElementById("download-btn");
+    const filterInput = document.getElementById("filter-activity-code"); // 활동코드 필터 입력 필드
+    const applyFilterBtn = document.getElementById("apply-filter");     // 필터 적용 버튼
+
+    if (monitoringBody && downloadBtn && filterInput && applyFilterBtn) {
+        const monitoringData = [];  // 업데이트들을 누적 저장하는 배열
+        let currentFilter = "";
+
+        // 필터 적용 버튼 클릭 시 현재 필터 값 저장 후 테이블 갱신
+        applyFilterBtn.addEventListener("click", () => {
+            currentFilter = filterInput.value.trim();
+            updateMonitoringTable();
+        });
+
+        // 각 업데이트 데이터를 바탕으로 테이블 행 생성 함수
+        function renderMonitoringRow(update) {
+            const tr = document.createElement("tr");
+            if (update.promptType === "vision") {
+                tr.innerHTML = `
+                    <td>${update.promptType}</td>
+                    <td>${update.studentName || ""}</td>
+                    <td>${update.teacherPrompt || ""}</td>
+                    <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력 이미지" style="max-width: 100px;">` : (update.aiResult || "")}</td>
+                    <td>${new Date(update.date).toLocaleString()}</td>
+                `;
+            } else if (update.promptType === "text") {
+                tr.innerHTML = `
+                    <td>${update.promptType}</td>
+                    <td>${update.studentName || ""}</td>
+                    <td>${update.teacherPrompt || ""}</td>
+                    <td>${update.inputText ? update.inputText : (update.aiResult || "")}</td>
+                    <td>${new Date(update.date).toLocaleString()}</td>
+                `;
+            } else if (update.promptType === "image") {
+                tr.innerHTML = `
+                    <td>${update.promptType}</td>
+                    <td>${update.studentName || ""}</td>
+                    <td>${update.teacherPrompt || ""}</td>
+                    <td>${update.adjectives || ""} ${update.aiImage ? `<br><img src="${update.aiImage}" alt="AI 이미지" style="max-width: 100px;">` : ""}</td>
+                    <td>${new Date(update.date).toLocaleString()}</td>
+                `;
+            } else if (update.promptType === "chatbot") {
+                tr.innerHTML = `
+                    <td>${update.promptType}</td>
+                    <td>${update.studentName || ""}</td>
+                    <td>${update.studentView || ""}</td>
+                    <td>${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}</td>
+                    <td>${new Date(update.date).toLocaleString()}</td>
+                `;
+            } else {
+                tr.innerHTML = `<td colspan="5">${JSON.stringify(update)}</td>`;
+            }
+            return tr;
+        }
+
+        // 테이블 갱신 함수 (현재 필터에 따라)
+        function updateMonitoringTable() {
+            monitoringBody.innerHTML = "";
+            monitoringData
+                .filter(update => !currentFilter || update.activityCode === currentFilter)
+                .forEach(update => {
+                    const tr = renderMonitoringRow(update);
+                    monitoringBody.appendChild(tr);
+                });
+        }
+
+        // Socket.IO를 통해 서버에서 "promptUpdated" 이벤트 수신 및 업데이트 처리
+        socket.on("promptUpdated", (update) => {
+            console.log("교사용 페이지: promptUpdated 이벤트 수신:", update);
+            update.date = update.date || Date.now();
+            monitoringData.push(update);
+            updateMonitoringTable();
+        });
+
+        // CSV 다운로드 기능
+        downloadBtn.addEventListener("click", () => {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Prompt Type,학생 이름,Prompt,AI 결과,날짜\n";
+            monitoringData.forEach(update => {
+                let row = [];
+                if (update.promptType === "vision") {
+                    row = [
+                        update.promptType,
+                        update.studentName || "",
+                        update.teacherPrompt || "",
+                        update.inputImage || update.aiResult || "",
+                        new Date(update.date).toLocaleString()
+                    ];
+                } else if (update.promptType === "text") {
+                    row = [
+                        update.promptType,
+                        update.studentName || "",
+                        update.teacherPrompt || "",
+                        update.inputText || update.aiResult || "",
+                        new Date(update.date).toLocaleString()
+                    ];
+                } else if (update.promptType === "image") {
+                    row = [
+                        update.promptType,
+                        update.studentName || "",
+                        update.teacherPrompt || "",
+                        update.adjectives ? update.adjectives + " | " + (update.aiImage || "") : (update.aiImage || ""),
+                        new Date(update.date).toLocaleString()
+                    ];
+                } else if (update.promptType === "chatbot") {
+                    row = [
+                        update.promptType,
+                        update.studentName || "",
+                        update.studentView || "",
+                        update.conversationHistory ? update.conversationHistory.join(" | ") : "",
+                        new Date(update.date).toLocaleString()
+                    ];
+                } else {
+                    row = [
+                        update.promptType,
+                        update.studentName || "",
+                        JSON.stringify(update),
+                        "",
+                        new Date(update.date).toLocaleString()
+                    ];
+                }
+                csvContent += row.map(item => `"${item}"`).join(",") + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "prompt_monitoring.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+    // -------------------------------------------------------------------
+    // 교사용 모니터링 탭 전용 코드 끝
 });

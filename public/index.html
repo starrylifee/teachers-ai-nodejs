@@ -21,6 +21,9 @@
         <li>
           <button id="nav-manage" onclick="showSection('manage')">Prompt 관리</button>
         </li>
+        <li>
+          <button id="nav-monitor" onclick="showSection('monitor')">Prompt 모니터링</button>
+        </li>
       </ul>
     </nav>
     
@@ -327,17 +330,48 @@
           </table>
         </div>
       </section>
+
+      <!-- 3. 프롬프트 모니터링 섹션 -->
+      <section id="content-monitor" style="display: none;">
+        <h2>Prompt 모니터링</h2>
+        <!-- 활동코드 필터 입력 추가 -->
+        <div id="monitor-filter-container">
+          <label for="filter-activity-code">활동 코드 필터:</label>
+          <input type="text" id="filter-activity-code" placeholder="활동 코드를 입력하세요">
+          <button id="apply-filter">적용</button>
+        </div>        
+        <button id="download-btn">Download CSV</button>
+        <table id="monitoring-table">
+          <thead>
+            <tr>
+              <!-- 열 제목은 프롬프트 타입에 따라 달라지므로, 공통 제목을 간략하게 작성 -->
+              <th>Prompt Type</th>
+              <th>학생 이름</th>
+              <th>Prompt</th>
+              <th>AI 결과</th>
+              <th>날짜</th>
+            </tr>
+          </thead>
+          <tbody id="monitoring-body">
+            <!-- 실시간 업데이트 데이터가 채워질 영역 -->
+          </tbody>
+        </table>
+      </section>
     </main>
   </div>
-  
+  <!-- Socket.IO 클라이언트 라이브러리 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- 교사용 페이지 전용 스크립트 -->
   <script src="/scripts/app.js"></script>
   <script>
-    // 사이드바 버튼 클릭 시 해당 섹션을 보여주는 함수
+    // 탭 전환 함수
     function showSection(section) {
       document.getElementById('nav-create').classList.remove('active');
       document.getElementById('nav-manage').classList.remove('active');
+      document.getElementById('nav-monitor').classList.remove('active');
       document.getElementById('content-create').style.display = 'none';
       document.getElementById('content-manage').style.display = 'none';
+      document.getElementById('content-monitor').style.display = 'none';
       
       if (section === 'create') {
         document.getElementById('content-create').style.display = 'block';
@@ -345,6 +379,9 @@
       } else if (section === 'manage') {
         document.getElementById('content-manage').style.display = 'block';
         document.getElementById('nav-manage').classList.add('active');
+      } else if (section === 'monitor') {
+        document.getElementById('content-monitor').style.display = 'block';
+        document.getElementById('nav-monitor').classList.add('active');
       }
     }
   </script>

@@ -1,15 +1,17 @@
 const express = require('express');
-const cors = require('cors'); // 추가
+const cors = require('cors');
 const { OpenAI } = require('openai');
 const { Client } = require('@notionhq/client');
+const http = require('http');  // HTTP 서버 생성용 모듈
+const { Server } = require('socket.io');  // Socket.IO Server 생성용 모듈
 require('dotenv').config();
 const path = require('path');
 
 const app = express();
 
-// Chrome 확장프로그램의 Origin 허용
+// Chrome 확장프로그램, 학생용 서버의 Origin 허용
 app.use(cors({
-  origin: "chrome-extension://kpdhcdnledjcoghnlijefbinpejliacf"
+  origin: ["chrome-extension://kpdhcdnledjcoghnlijefbinpejliacf", "https://port-0-teachers-ai-nodejs-m6oc1d66fae356ac.sel4.cloudtype.app"]
 }));
 
 app.use(express.json());
@@ -39,6 +41,31 @@ const DATABASES = {
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+
+// **HTTP 서버 생성 및 Socket.IO 초기화**
+const server = http.createServer(app);
+const io = new Server(server);  // Socket.IO 인스턴스 생성
+
+// Socket.IO 연결 이벤트 처리 (예시)
+io.on('connection', (socket) => {
+  console.log('A client connected');
+  // 예시로 클라이언트에 welcome 이벤트 전송
+  socket.emit('welcome', 'Welcome to the Socket.IO server!');
+  socket.on('disconnect', () => {
+    console.log('A client disconnected');
+  });
+});
+
+// 교사용 서버에 A(학생용) 서버에서 전달한 학생 활동 데이터를 받기 위한 API 엔드포인트
+app.post('/api/notify', (req, res) => {
+  const data = req.body;  // A 서버에서 전달한 학생 활동 데이터
+  console.log('Received notification from Student Server:', data);
+
+  // 받은 데이터를 교사용 클라이언트로 Socket.IO를 통해 브로드캐스트
+  io.emit('promptUpdated', data);
+
+  res.json({ success: true });
+});
 
 /**
  * Helper: Generate student view using OpenAI  
@@ -349,8 +376,23 @@ app.post('/update-prompt', async (req, res) => {
 });
 
 
-// Start the server
+// 마지막에 서버 실행 (Socket.IO를 붙인 서버로 실행)
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+/*
+// 테스트용 이벤트 emit (예: 30초마다)
+setInterval(() => {
+  const testUpdate = {
+    activityCode: "TEST",
+    promptType: "vision",
+    studentName: "테스트 학생",
+    teacherPrompt: "테스트 프롬프트",
+    aiResult: "테스트 AI 결과",
+    date: new Date().toISOString()
+  };
+  io.emit("promptUpdated", testUpdate);
+  console.log("교사용 서버에서 테스트 이벤트 emit:", testUpdate);
+}, 30000);*/
+
+server.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
