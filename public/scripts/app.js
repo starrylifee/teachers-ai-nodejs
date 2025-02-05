@@ -963,6 +963,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("프롬프트 생성 중 에러가 발생했습니다.");
         }
     });
+
     // 교사용 모니터링 탭 전용 코드 시작
     const monitoringBody = document.getElementById("monitoring-body");
     const downloadBtn = document.getElementById("download-btn");
@@ -988,16 +989,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (update.promptType === "vision") {
             tr.innerHTML = `
                 <td>${update.promptType}</td>
-                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${studentName}</td>
                 <td>${update.teacherPrompt || ""}</td>
-                <td>${""}</td>
-                <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력한 이미지" style="max-width: 100px;">` : (update.aiResult || "")}</td>
+                <td>${update.inputImage ? `<img src="${update.inputImage}" alt="입력한 이미지" style="max-width: 100px;">` : ""}</td>
+                <td>${update.aiResult || ""}</td>
                 <td>${new Date(update.date).toLocaleString()}</td>
             `;
         } else if (update.promptType === "text") {
             tr.innerHTML = `
                 <td>${update.promptType}</td>
-                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${studentName}</td>
                 <td>${update.teacherPrompt || ""}</td>
                 <td>${update.inputText || ""}</td>
                 <td>${update.aiResult || ""}</td>
@@ -1006,7 +1007,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (update.promptType === "image") {
             tr.innerHTML = `
                 <td>${update.promptType}</td>
-                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${studentName}</td>
                 <td>${update.teacherPrompt || ""}</td>
                 <td>${update.adjectives || ""}</td>
                 <td>${update.aiImage ? `<img src="${update.aiImage}" alt="AI 결과" style="max-width: 100px;">` : ""}</td>
@@ -1015,14 +1016,13 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (update.promptType === "chatbot") {
             tr.innerHTML = `
                 <td>${update.promptType}</td>
-                <td><div class="nowrap-cell">${studentName}</div></td>
+                <td>${studentName}</td>
                 <td>${update.studentView || ""}</td>
-                <td>
+                <td colspan="2">
                     <div class="scroll-cell">
-                        ${update.conversationHistory ? update.conversationHistory.join(" | ") : ""}
+                        ${update.conversationHistory ? update.conversationHistory.join("<br>") : ""}
                     </div>
                 </td>
-                <td>${update.aiResult || ""}</td>
                 <td>${new Date(update.date).toLocaleString()}</td>
             `;
         } else {
@@ -1074,7 +1074,6 @@ document.addEventListener("DOMContentLoaded", () => {
         updateMonitoringTable();
     });
     
-
     // CSV 다운로드 기능 (BOM 추가로 한글 깨짐 방지)
     downloadBtn.addEventListener("click", () => {
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
